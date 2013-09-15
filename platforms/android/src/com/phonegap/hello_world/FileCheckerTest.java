@@ -23,19 +23,19 @@ public class FileCheckerTest {
 	}
 	
 	@Test
-	public void testSfv(){
+	public void testSfvToHash(){
 		HashMap<String, String> result = sfvToHash(localSfv);
 		assertTrue(result.containsKey("poker/audio/slots/spin_2.mp3"));
 		assertEquals("FB524549", result.get("poker/audio/slots/spin_2.mp3"));
 	}
 	
 	@Test
-	public void compareEntriesTest(){
+	public void testCompareEntries(){
 		assertTrue(1 == compareEntries(sfv.localSfv, changeHash()).size());
 	}
 	
 	@Test
-	public void compareWithLocal(){
+	public void testCompareWithLocal(){
 		sfv.updateLocal(changeHash());
 		
 		assertNull(sfv.localSfv.get("poker/audio/slots/raise_increment.mp3"));

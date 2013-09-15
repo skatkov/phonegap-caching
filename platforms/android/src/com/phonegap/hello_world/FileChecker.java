@@ -15,9 +15,7 @@ import java.util.Map;
 
 
 public class FileChecker {
-	
 	public HashMap <String, String> localSfv = null;
-	
 
     public FileChecker(HashMap<String, String> localSfv) {
     	this.localSfv = localSfv;
@@ -37,22 +35,24 @@ public class FileChecker {
     		}
     	} catch (FileNotFoundException e){
     		e.getStackTrace();
-
     	} catch (IOException e){
     		e.getStackTrace();
     	} finally {
-    		
-    		try {
-    			if (reader != null){
-    				reader.close();    			    				
-    			}
-    		} catch (IOException e) {
-    			e.getStackTrace();
-    		}
+    		closeReader(reader);
     	}
     	
 		return hash;
     }
+
+	private static void closeReader(BufferedReader reader) {
+		try {
+			if (reader != null){
+				reader.close();    			    				
+			}
+		} catch (IOException e) {
+			e.getStackTrace();
+		}
+	}
 
 	public void updateLocal(HashMap<String, String> remoteHash) {
 		Iterator<String> result = compareEntries(this.localSfv, remoteHash).iterator();
@@ -65,18 +65,23 @@ public class FileChecker {
 	public static <K extends Comparable<? super K>, V>
 	List<String> compareEntries(final Map<K, V> map1,
 	    final Map<K, V> map2){
-		//return list of keys that don't different checksum
+		//return list of keys that have different checksum
 	    final Collection<K> allKeys = new HashSet<K>();
 	    allKeys.addAll(map1.keySet());
 	    allKeys.addAll(map2.keySet());
 	    List<String> result = new ArrayList<String>();
 	    for(final K key : allKeys){
-	    	if (!(map1.containsKey(key) == map2.containsKey(key) &&
-	            Boolean.valueOf(equal(map1.get(key), map2.get(key))))){
+	    	if (checksumDifferent(map1, map2, key)){
 	    		result.add((String) key);
 	    	}
 	    }
 	    return result;
+	}
+
+	private static <K extends Comparable<? super K>, V> boolean checksumDifferent(
+			final Map<K, V> map1, final Map<K, V> map2, final K key) {
+		return !(map1.containsKey(key) == map2.containsKey(key) &&
+		    Boolean.valueOf(equal(map1.get(key), map2.get(key))));
 	}
 
 	private static boolean equal(final Object obj1, final Object obj2){
