@@ -4,7 +4,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 
-import org.apache.cordova.*;
+import org.apache.cordova.CordovaActivity;
+import org.apache.cordova.CordovaChromeClient;
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.CordovaWebViewClient;
 
 public class HelloWorld extends CordovaActivity {
     CordovaWebView webView;

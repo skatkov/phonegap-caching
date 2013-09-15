@@ -3,3 +3,6 @@
 **/.idea
 **/bin
 **/out
+**/.gradle
+**/build
+

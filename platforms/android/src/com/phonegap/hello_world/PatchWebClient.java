@@ -1,24 +1,23 @@
 package com.phonegap.hello_world;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import android.annotation.TargetApi;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.util.Log;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.StringBufferInputStream;
 
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CordovaWebViewClient;
 import org.apache.cordova.FileHelper;
-import org.apache.cordova.CordovaInterface;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringBufferInputStream;
 
 public class PatchWebClient extends CordovaWebViewClient {
 
