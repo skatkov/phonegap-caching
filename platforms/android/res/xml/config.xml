@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.cordova.helloCordova" version="2.0.0" xmlns="http://www.w3.org/ns/widgets">
+<widget id="io.cordova.helloCordova" version="2.0.0">
     <name>Hello Cordova</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
@@ -12,6 +12,8 @@
         <param name="android-package" value="org.apache.cordova.App" />
     </feature>
     <access origin="http://127.0.0.1*" />
+    <access origin="http://*.google.com"/>
+    <access origin="http://www.prisonfight.org"/>
     <preference name="useBrowserHistory" value="true" />
     <preference name="exit-on-suspend" value="false" />
     <preference name="permissions" value="none" />
