@@ -1,7 +1,7 @@
 package com.phonegap.hello_world.test;
 
 import static org.junit.Assert.*;
-import static com.phonegap.hello_world.FileChecker.sfvToHash;
+import static com.phonegap.hello_world.ProjectHelper.sfvToHash;
 import java.io.File;
 import java.util.HashMap;
 import org.junit.Before;
@@ -22,13 +22,6 @@ public class FileCheckerTest {
 	public void testConstructor() {
 		assertTrue(this.sfv.useCached("poker/audio/slots/spin_2.mp3"));
 	}
-	
-	@Test
-	public void testSfvToHash(){
-		HashMap<String, String> result = sfvToHash(localSfv);
-		assertTrue(result.containsKey("poker/audio/slots/spin_2.mp3"));
-		assertEquals("FB524549", result.get("poker/audio/slots/spin_2.mp3"));
-	}
 		
 	@Test
 	public void testCompareWithLocal(){
@@ -41,6 +34,7 @@ public class FileCheckerTest {
 	public void testUseCached(){
 		assertFalse(sfv.useCached("missing/path.mp3"));
 		assertTrue(sfv.useCached("poker/audio/slots/raise_increment.mp3"));
+		assertFalse(sfv.useCached(null));
 	}
 	
 	private HashMap<String, String> changeHash() {

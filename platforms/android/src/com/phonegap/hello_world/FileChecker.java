@@ -21,39 +21,6 @@ public class FileChecker {
     	this.localSfv = localSfv;
     }
     
-    public static HashMap<String, String> sfvToHash(File sfvFile){
-    	HashMap<String, String> hash = new HashMap<String, String>();
-    	BufferedReader reader = null;
-    	
-    	try {
-    		reader = new BufferedReader(new FileReader(sfvFile));
-    		String lineText = null;
-    		
-    		while ((lineText = reader.readLine() ) != null){
-    			String[] str = lineText.split(" ");
-    			hash.put(str[0], str[1]);
-    		}
-    	} catch (FileNotFoundException e){
-    		e.getStackTrace();
-    	} catch (IOException e){
-    		e.getStackTrace();
-    	} finally {
-    		closeReader(reader);
-    	}
-    	
-		return hash;
-    }
-
-	private static void closeReader(BufferedReader reader) {
-		try {
-			if (reader != null){
-				reader.close();    			    				
-			}
-		} catch (IOException e) {
-			e.getStackTrace();
-		}
-	}
-
 	public void updateLocal(HashMap<String, String> remoteHash) {
 		Iterator<String> result = compareEntries(this.localSfv, remoteHash).iterator();
 		while (result.hasNext()){

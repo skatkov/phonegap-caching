@@ -1,5 +1,6 @@
 package com.phonegap.hello_world;
 
+import java.io.File;
 import java.io.IOException;
 
 import android.annotation.TargetApi;
@@ -15,6 +16,8 @@ import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.IceCreamCordovaWebViewClient;
 import static com.phonegap.hello_world.ProjectHelper.getUrlPath;
+import com.phonegap.hello_world.FileChecker;
+import static com.phonegap.hello_world.ProjectHelper.sfvToHash;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
@@ -36,14 +39,17 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
         Log.d(TAG, "shouldInterceptRequest -> called, URL is " + url.toString());
+        FileChecker localCache = new FileChecker(sfvToHash(new File("./assets/sfv/local.sfv")));
+        
         String path = getUrlPath(url);
-        if (path != null && path.contains(".css")){
-        	return getCssWebResourceResponseFromAsset(path);
-        } else if (path != null && path.contains(".png")){
-        	return getPngWebResourceResponseFromAsset(path);
-        } else {        	
-        	return super.shouldInterceptRequest(view, url);
-        }
+        if (localCache.useCached(path)){
+        	if (path.contains(".css")){
+        		return getCssWebResourceResponseFromAsset(path);
+        	} else if (path != null && path.contains(".png")){
+        		return getPngWebResourceResponseFromAsset(path);
+        	}         	
+        } 
+        return super.shouldInterceptRequest(view, url);
     }
 
 	private WebResourceResponse getPngWebResourceResponseFromAsset(String path) {
