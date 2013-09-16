@@ -38,18 +38,32 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
         Log.d(TAG, "shouldInterceptRequest -> called, URL is " + url.toString());
         String path = getUrlPath(url);
         if (path != null && path.contains(".css")){
-        	try {
-        		Log.d(TAG, "Lets replace css with assets " + path.toString());
-				return new WebResourceResponse("text/css", "UTF-8", activity.getAssets().open(path));
-			} catch (IOException e) {
-				Log.e(TAG, e.getMessage());
-				// FIXME: probably, null is not a good idea to return. return super.?
-				return null;
-			}
+        	return getCssWebResourceResponseFromAsset(path);
+        } else if (path != null && path.contains(".png")){
+        	return getPngWebResourceResponseFromAsset(path);
         } else {        	
         	return super.shouldInterceptRequest(view, url);
         }
     }
+
+	private WebResourceResponse getPngWebResourceResponseFromAsset(String path) {
+		try {
+			return new WebResourceResponse("image/png", "UTF-8", activity.getAssets().open(path));
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage() + " missing in cache, downloading...");
+			return null;
+		}
+	}
+
+	private WebResourceResponse getCssWebResourceResponseFromAsset(String path) {
+		try {
+			Log.d(TAG, "Lets replace css with assets " + path.toString());
+			return new WebResourceResponse("text/css", "UTF-8", activity.getAssets().open(path));
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage() + " missing in cache, downloading...");
+			return null;
+		}
+	}
 
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         Log.e(TAG, "onReceivedError -> called, URL is " + failingUrl);
