@@ -15,7 +15,7 @@ import java.util.Map;
 
 
 public class FileChecker {
-	public HashMap <String, String> localSfv = null;
+	private HashMap <String, String> localSfv = null;
 
     public FileChecker(HashMap<String, String> localSfv) {
     	this.localSfv = localSfv;
@@ -62,7 +62,7 @@ public class FileChecker {
 		}
 	}
 	
-	public static <K extends Comparable<? super K>, V>
+	private static <K extends Comparable<? super K>, V>
 	List<String> compareEntries(final Map<K, V> map1,
 	    final Map<K, V> map2){
 		//return list of keys that have different checksum
@@ -86,5 +86,9 @@ public class FileChecker {
 
 	private static boolean equal(final Object obj1, final Object obj2){
 	    return obj1 == obj2 || (obj1 != null && obj1.equals(obj2));
+	}
+
+	public boolean useCached(String filePath) {
+		return this.localSfv.get(filePath) == null ? false : true;
 	}
 }
