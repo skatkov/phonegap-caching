@@ -21,7 +21,7 @@ public class HelloWorld extends CordovaActivity {
         this.init();
 
         super.setIntegerProperty("loadUrlTimeoutValue", 160000);
-        super.loadUrl("http://www.prisonfight.org");
+        super.loadUrl("http://phonegap-test.herokuapp.com");
         //super.loadUrl("file:///android_asset/www/index.html")
     }
 
