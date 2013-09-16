@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import android.util.Log;
+
 
 public class FileChecker {
 	private HashMap <String, String> localSfv = null;

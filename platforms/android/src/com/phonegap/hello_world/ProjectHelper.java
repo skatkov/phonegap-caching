@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -19,12 +21,12 @@ public class ProjectHelper {
 			}			
     }
 	
-	public static HashMap<String, String> sfvToHash(File sfvFile){
+	public static HashMap<String, String> sfvToHash(InputStream sfvFile){
     	HashMap<String, String> hash = new HashMap<String, String>();
     	BufferedReader reader = null;
     	
     	try {
-    		reader = new BufferedReader(new FileReader(sfvFile));
+    		reader = new BufferedReader(new InputStreamReader(sfvFile, "UTF-8"));
     		String lineText = null;
     		
     		while ((lineText = reader.readLine() ) != null){

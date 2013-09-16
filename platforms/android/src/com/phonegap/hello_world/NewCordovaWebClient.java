@@ -1,6 +1,5 @@
 package com.phonegap.hello_world;
 
-import java.io.File;
 import java.io.IOException;
 
 import android.annotation.TargetApi;
@@ -23,10 +22,13 @@ import static com.phonegap.hello_world.ProjectHelper.sfvToHash;
 public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
 	private final String TAG = "NewCordovaWebClient";
     Activity activity;
+    FileChecker localCache;
 
     public NewCordovaWebClient(CordovaInterface cordova,CordovaWebView view, CordovaActivity activity){
         super(cordova, view);
         this.activity = activity;
+        localCache = initLocalCache();
+        
         Log.d("DEBUG", "New cordova interface is running");
     }
 
@@ -39,10 +41,9 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
         Log.d(TAG, "shouldInterceptRequest -> called, URL is " + url.toString());
-        FileChecker localCache = new FileChecker(sfvToHash(new File("./assets/sfv/local.sfv")));
         
         String path = getUrlPath(url);
-        if (localCache.useCached(path)){
+        if (localCache.useCached(path)) {
         	if (path.contains(".css")){
         		return getCssWebResourceResponseFromAsset(path);
         	} else if (path != null && path.contains(".png")){
@@ -51,6 +52,15 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
         } 
         return super.shouldInterceptRequest(view, url);
     }
+
+	private FileChecker initLocalCache() {
+		try {
+        	return new FileChecker(sfvToHash(activity.getAssets().open("sfv/cache.sfv")));
+		} catch (IOException e) {
+			Log.e(TAG, "Local sfv cache file is missing");
+			return new FileChecker(null);
+		}
+	}
 
 	private WebResourceResponse getPngWebResourceResponseFromAsset(String path) {
 		try {

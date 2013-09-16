@@ -3,14 +3,25 @@ package com.phonegap.hello_world.test;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import android.util.Log;
 
 import static com.phonegap.hello_world.ProjectHelper.getUrlPath;
 import static com.phonegap.hello_world.ProjectHelper.sfvToHash;
 public class ProjectHelperTest {
-	final File localSfv = new File("./assets/sfv/local.sfv");
+	InputStream localSfv; 
+	
+	@Before
+	public void getStream() throws FileNotFoundException{
+		localSfv = new FileInputStream("./assets/sfv/local.sfv");	
+	}
 	
 	@Test
 	public void testGetUrlPath() {
