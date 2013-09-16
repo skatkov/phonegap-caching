@@ -1,7 +1,6 @@
 package com.phonegap.hello_world;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -19,6 +18,7 @@ import static com.phonegap.hello_world.ProjectHelper.getUrlPath;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
+	private final String TAG = "NewCordovaWebClient";
     Activity activity;
 
     public NewCordovaWebClient(CordovaInterface cordova,CordovaWebView view, CordovaActivity activity){
@@ -29,23 +29,21 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url){
-        Log.d("NewCordovaWebClient", "shouldOverrideUrlLoading -> called, URL is " + url);
+        Log.d(TAG, "shouldOverrideUrlLoading -> called, URL is " + url);
         return super.shouldOverrideUrlLoading(view, url);
     }
 
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-        Log.d("NewCordovaWebClient", "shouldInterceptRequest -> called, URL is " + url.toString());
+        Log.d(TAG, "shouldInterceptRequest -> called, URL is " + url.toString());
         String path = getUrlPath(url);
-        Log.d("NewCordovaWebClient", "url path is "  + path);
-        if (path.contains(".css")){
+        if (path != null && path.contains(".css")){
         	try {
-        		InputStream file = activity.getAssets().open("css/main.css");
-        		Log.d("NewCordovaWebClient", "rewriting main.css " + file.toString());
-				return new WebResourceResponse("text/css", "UTF-8", file);
+        		Log.d(TAG, "Lets replace css with assets " + path.toString());
+				return new WebResourceResponse("text/css", "UTF-8", activity.getAssets().open(path));
 			} catch (IOException e) {
-				Log.e("NewCordovaWebClient", e.getMessage());
-				// FIXME: probably, null is not a good idea to return
+				Log.e(TAG, e.getMessage());
+				// FIXME: probably, null is not a good idea to return. return super.?
 				return null;
 			}
         } else {        	
@@ -54,7 +52,7 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
     }
 
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-        Log.e("NewCordovaWebClient", "onReceivedError -> called, URL is " + failingUrl);
+        Log.e(TAG, "onReceivedError -> called, URL is " + failingUrl);
         Toast.makeText(this.activity, description + " URL: " + failingUrl , Toast.LENGTH_SHORT).show();
     }    
 }

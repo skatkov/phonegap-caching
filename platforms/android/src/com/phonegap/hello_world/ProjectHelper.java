@@ -5,14 +5,11 @@ import java.net.URL;
 
 public class ProjectHelper {
 	public static String getUrlPath(String strUrl){
-    	if (strUrl.contains("http:") || strUrl.contains("https:")){
-			try {
-				return new URL(strUrl).getPath();
+    		try {
+				String path = new URL(strUrl).getPath().substring(1);
+				return	path.equals("") ?  null : path;
 			} catch (MalformedURLException e) {
-				return "/";
+				return null;
 			}			
-		} else {
-			return "/";
-		} 
     }
 }
