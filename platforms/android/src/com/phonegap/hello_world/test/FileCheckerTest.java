@@ -1,4 +1,4 @@
-package com.phonegap.hello_world;
+package com.phonegap.hello_world.test;
 
 import static org.junit.Assert.*;
 import static com.phonegap.hello_world.FileChecker.sfvToHash;
@@ -7,6 +7,8 @@ import java.io.File;
 import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.phonegap.hello_world.FileChecker;
 
 public class FileCheckerTest {
 	final File localSfv = new File("./assets/sfv/local.sfv");
