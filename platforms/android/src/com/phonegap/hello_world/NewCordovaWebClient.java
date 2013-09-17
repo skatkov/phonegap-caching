@@ -56,23 +56,15 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
           }).start();
 	}
 
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url){
-        Log.d(TAG, "shouldOverrideUrlLoading -> called, URL is " + url);
-        return super.shouldOverrideUrlLoading(view, url);
-    }
 
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
         Log.d(TAG, "shouldInterceptRequest -> called, URL is " + url.toString());
         
+        
         String path = getUrlPath(url);
         if (localCache.useCached(path)) {
-        	if (path.contains(".css")){
-        		return getCssWebResourceResponseFromAsset(path);
-        	} else if (path.contains(".png")){
-        		return getPngWebResourceResponseFromAsset(path);
-        	}         	
+        	return getWebResourceResponseFromAsset("file:///android_asset/" + path);	
         } 
         return super.shouldInterceptRequest(view, url);
     }
@@ -80,6 +72,7 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
 	private FileChecker initLocalCache() {
 		try {
 			// FIXME: change hardcode and move path to config
+			// resourceApi breaks on MimeTypeFromExtension(), so just use getAssets() 
         	return new FileChecker(sfvToHash(activity.getAssets().open("sfv/cache.sfv")));
 		} catch (IOException e) {
 			Log.e(TAG, "Local sfv cache file is missing");
@@ -87,23 +80,16 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
 		}
 	}
 
-	private WebResourceResponse getPngWebResourceResponseFromAsset(String path) {
+	private WebResourceResponse getWebResourceResponseFromAsset(String path) {
 		try {
-			return new WebResourceResponse("image/png", "UTF-8", activity.getAssets().open(path));
+			OpenForReadResult result = resourceApi.openForRead(Uri.parse(path));
+			return new WebResourceResponse(result.mimeType, "UTF-8", result.inputStream);
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage() + " missing in cache, downloading...");
 			return null;
 		}
 	}
 
-	private WebResourceResponse getCssWebResourceResponseFromAsset(String path) {
-		try {
-			return new WebResourceResponse("text/css", "UTF-8", activity.getAssets().open(path));
-		} catch (IOException e) {
-			Log.e(TAG, e.getMessage() + " missing in cache, downloading...");
-			return null;
-		}
-	}
 
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         Log.e(TAG, "onReceivedError -> called, URL is " + failingUrl);
