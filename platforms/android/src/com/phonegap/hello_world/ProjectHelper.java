@@ -11,6 +11,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
+import android.util.Log;
+
 public class ProjectHelper {
 	public static String getUrlPath(String strUrl){
     		try {
@@ -34,7 +36,7 @@ public class ProjectHelper {
     			hash.put(str[0], str[1]);
     		}
     	} catch (FileNotFoundException e){
-    		e.getStackTrace();
+    		Log.e("ProjectHelper", "File not fould");
     	} catch (IOException e){
     		e.getStackTrace();
     	} finally {

@@ -2,7 +2,7 @@ package com.phonegap.hello_world;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import android.net.Uri;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import org.apache.cordova.CordovaActivity;
 import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaResourceApi;
+import org.apache.cordova.CordovaResourceApi.OpenForReadResult;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.IceCreamCordovaWebViewClient;
 import static com.phonegap.hello_world.ProjectHelper.getUrlPath;
@@ -25,28 +27,34 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
 	private final String TAG = "NewCordovaWebClient";
     Activity activity;
     FileChecker localCache;
+    CordovaResourceApi resourceApi;
 
     public NewCordovaWebClient(CordovaInterface cordova,CordovaWebView view, CordovaActivity activity){
         super(cordova, view);
+        
         this.activity = activity;
-        localCache = initLocalCache();
+        this.localCache = initLocalCache();
+        this.resourceApi = view.getResourceApi();
         
-        //FIXME: add threaded file download (separate from main activity)
-        /*
-        try {
-			localCache.updateLocal(sfvToHash(new URL("http://phonegap-test.herokuapp.com/cache.sfv").openStream()));
-			Log.d(TAG, "Update local cach.sfv");
-        } catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
-        
-        Log.d("DEBUG", "New cordova interface is running");
+        updateLocalCache();
+                
+        Log.d(TAG, "New cordova interface is running");
     }
+
+	private void updateLocalCache() {
+		new Thread(new Runnable() {
+            public void run() {
+            	try {
+            		//FIXME: remove hardcode and move filepath to Config
+            		OpenForReadResult result = resourceApi.openForRead(Uri.parse("http://phonegap-test.herokuapp.com/sfv/cache.sfv"));
+        			localCache.updateLocal(sfvToHash(result.inputStream));
+                    Log.d(TAG, "Updated local cache with remote cache");
+        		} catch (IOException e) {
+        			Log.e(TAG, e.getStackTrace().toString());
+        		}
+            }
+          }).start();
+	}
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url){
