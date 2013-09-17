@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -25,38 +26,53 @@ import static com.phonegap.hello_world.ProjectHelper.sfvToHash;
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
 	private final String TAG = "NewCordovaWebClient";
-    Activity activity;
+    HelloWorld activity;
     FileChecker localCache;
     CordovaResourceApi resourceApi;
+    private Handler handler;
+    
 
     public NewCordovaWebClient(CordovaInterface cordova,CordovaWebView view, CordovaActivity activity){
         super(cordova, view);
         
-        this.activity = activity;
+        this.activity = (HelloWorld) activity;
         //#2 - App loads local cache manifest of SFV format into hashmap (url, checksum)
         this.localCache = initLocalCache();
         this.resourceApi = view.getResourceApi();
+        this.handler = new Handler();
         
         updateLocalCache();
                 
         Log.d(TAG, "New cordova interface is running");
     }
+    
 
 	private void updateLocalCache() {
-		new Thread(new Runnable() {
-            public void run() {
-            	try {
-            		//FIXME: remove hardcode and move filepath to Config
-            		//#3 app loads remote cache manifest in sfv format
-            		OpenForReadResult result = resourceApi.openForRead(Uri.parse("http://phonegap-test.herokuapp.com/sfv/cache.sfv"));
-        			//#4 app removes any url from cache map where checksum has changed
-            		localCache.updateLocal(sfvToHash(result.inputStream));
-                    Log.d(TAG, "Updated local cache with remote cache");
-        		} catch (IOException e) {
-        			Log.e(TAG, e.getStackTrace().toString());
-        		}
-            }
-          }).start();
+			new Thread(new Task()).start();
+        }
+	
+	class Task implements Runnable {
+		@Override
+		public void run(){
+			try {
+	    		//FIXME: remove hardcode and move filepath to Config
+	    		//#3 app loads remote cache manifest in sfv format
+	    		OpenForReadResult result = resourceApi.openForRead(Uri.parse("http://phonegap-test.herokuapp.com/sfv/cache.sfv"), true);
+				//#4 app removes any url from cache map where checksum has changed
+	    		localCache.updateLocal(sfvToHash(result.inputStream));
+	            Log.d(TAG, "Updated local cache with remote cache");
+			} catch (IOException e) {
+				Log.e(TAG, e.getStackTrace().toString());
+			} 
+			handler.post(new Runnable() {
+                @Override
+	            	public void run() {
+                		Log.d(TAG, "Sync is finished");
+                        activity.loadUrlNow();
+	                }
+                });
+
+		}
 	}
 
 
@@ -67,7 +83,7 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
         String path = getUrlPath(url);
         //#6 app intercepts any url that is contained in the cache map and loads that file from local assets
         return localCache.useCached(path) ?
-        	 getWebResourceResponseFromAsset("file:///android_asset/" + path):super.shouldInterceptRequest(view, url);
+        	 getWebResourceResponseFromAsset("file:///android_asset/" + path) : super.shouldInterceptRequest(view, url);
     }
 
 	private FileChecker initLocalCache() {
