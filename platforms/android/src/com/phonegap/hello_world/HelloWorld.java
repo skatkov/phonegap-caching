@@ -16,13 +16,13 @@ public class HelloWorld extends CordovaActivity {
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        // Set by <content src="index.html" /> in config.xml
-
+        
+        //#1 - Initialization of cardova app
         this.init();
 
         super.setIntegerProperty("loadUrlTimeoutValue", 160000);
+        // #5 app loads host page in cordova webclient (dummy website from ./heroku-static-site)
         super.loadUrl("http://phonegap-test.herokuapp.com");
-        //super.loadUrl("file:///android_asset/www/index.html")
     }
 
     public void init(){

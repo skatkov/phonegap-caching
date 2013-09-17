@@ -33,6 +33,7 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
         super(cordova, view);
         
         this.activity = activity;
+        //#2 - App loads local cache manifest of SFV format into hashmap (url, checksum)
         this.localCache = initLocalCache();
         this.resourceApi = view.getResourceApi();
         
@@ -46,8 +47,10 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
             public void run() {
             	try {
             		//FIXME: remove hardcode and move filepath to Config
+            		//#3 app loads remote cache manifest in sfv format
             		OpenForReadResult result = resourceApi.openForRead(Uri.parse("http://phonegap-test.herokuapp.com/sfv/cache.sfv"));
-        			localCache.updateLocal(sfvToHash(result.inputStream));
+        			//#4 app removes any url from cache map where checksum has changed
+            		localCache.updateLocal(sfvToHash(result.inputStream));
                     Log.d(TAG, "Updated local cache with remote cache");
         		} catch (IOException e) {
         			Log.e(TAG, e.getStackTrace().toString());
@@ -60,19 +63,17 @@ public class NewCordovaWebClient extends IceCreamCordovaWebViewClient {
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
         Log.d(TAG, "shouldInterceptRequest -> called, URL is " + url.toString());
-        
-        
+         
         String path = getUrlPath(url);
-        if (localCache.useCached(path)) {
-        	return getWebResourceResponseFromAsset("file:///android_asset/" + path);	
-        } 
-        return super.shouldInterceptRequest(view, url);
+        //#6 app intercepts any url that is contained in the cache map and loads that file from local assets
+        return localCache.useCached(path) ?
+        	 getWebResourceResponseFromAsset("file:///android_asset/" + path):super.shouldInterceptRequest(view, url);
     }
 
 	private FileChecker initLocalCache() {
 		try {
 			// FIXME: change hardcode and move path to config
-			// resourceApi breaks on MimeTypeFromExtension(), so just use getAssets() 
+			// resourceApi breaks on getMimeTypeFromExtension(), so just use getAssets() 
         	return new FileChecker(sfvToHash(activity.getAssets().open("sfv/cache.sfv")));
 		} catch (IOException e) {
 			Log.e(TAG, "Local sfv cache file is missing");
